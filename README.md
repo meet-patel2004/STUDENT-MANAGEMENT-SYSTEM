@@ -1,4 +1,4 @@
-# 📚 Student Management System (SMS)
+# 📚 Student Management System
 
 A RESTful API built with **Flask** for managing students, attendance, marks, and academic reports. It supports role-based access control (admin, teacher, student), JWT authentication, and export capabilities.
 
