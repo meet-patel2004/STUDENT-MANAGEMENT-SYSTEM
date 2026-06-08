@@ -3,12 +3,7 @@ import sys
 import csv
 import math
 import MySQLdb.cursors
-import auth
-import attendance
-import exports
-import marks
-import reports
-import student
+
 
 from functools import wraps
 from datetime import datetime, timedelta
@@ -68,6 +63,13 @@ GRADE_POINTS = {
     'D': 1.0,
     'F': 0.0,
 }
+
+import auth
+import attendance
+import exports
+import marks
+import reports
+import student
 
 def make_csv_response(filename, headers, rows):
     string_buffer = StringIO()

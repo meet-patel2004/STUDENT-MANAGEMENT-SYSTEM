@@ -3,6 +3,8 @@ from flask import request, jsonify
 from flask_jwt_extended import jwt_required
 from datetime import datetime
 
+from helper import requires_role
+
 @app.route('/students/<int:sid>/attendance', methods=['POST'])
 @app.requires_role('admin', 'teacher')
 def mark_attendance(sid):

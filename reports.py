@@ -1,4 +1,4 @@
-import app
+from app import app
 from flask import jsonify, request, send_file
 from flask_jwt_extended import jwt_required
 from helper import cur, gpa_for, grade_for
