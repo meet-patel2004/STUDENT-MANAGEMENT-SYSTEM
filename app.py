@@ -3,6 +3,12 @@ import sys
 import csv
 import math
 import MySQLdb.cursors
+import auth
+import attendance
+import exports
+import marks
+import reports
+import student
 
 from functools import wraps
 from datetime import datetime, timedelta
@@ -15,13 +21,12 @@ from openpyxl import Workbook
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from dotenv import load_dotenv
+
 load_dotenv()
 
 
 app = Flask(__name__)
 
-# Ensure running `python app.py` and importing `app` use the same module object.
-# This prevents duplicate app instances when route modules do `import app`.
 sys.modules.setdefault('app', sys.modules[__name__])
 
 app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST')
@@ -35,7 +40,6 @@ mysql = MySQL(app)
 bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 
-# expose Flask and helper methods on the module so other files can use import app
 route = app.route
 wraps = wraps
 jsonify = jsonify
@@ -64,15 +68,6 @@ GRADE_POINTS = {
     'D': 1.0,
     'F': 0.0,
 }
-
-# register route modules so Flask sees endpoints defined outside app.py
-import auth
-import attendance
-import exports
-import marks
-import reports
-import student
-
 
 def make_csv_response(filename, headers, rows):
     string_buffer = StringIO()
@@ -137,7 +132,6 @@ def generate_report_card(student, marks, attendance_summary, gpa, cgpa):
     line_y -= 25
 
     headers = ['Subject', 'Type', 'Exam Type', 'Marks', 'Grade', 'Semester']
-    # Improved column positions with better spacing for longer subject names
     x_positions = [40, 210, 260, 330, 370, 410]
     col_widths = [200, 45, 65, 35, 35, 160]
 
@@ -145,7 +139,6 @@ def generate_report_card(student, marks, attendance_summary, gpa, cgpa):
     for idx, header in enumerate(headers):
         pdf.drawString(x_positions[idx], line_y, header)
     line_y -= 12
-    # Draw line under headers
     pdf.line(40, line_y, 570, line_y)
     line_y -= 4
 
@@ -156,7 +149,6 @@ def generate_report_card(student, marks, attendance_summary, gpa, cgpa):
             pdf.setFont('Helvetica', 8)
             line_y = height - 60
         
-        # Truncate text to fit column width - Subject gets more space now
         subject = str(record.get('subject', ''))[:35]
         assessment_type = str(record.get('assessment_type', ''))[:10]
         exam_type = str(record.get('exam_type', ''))[:12]
