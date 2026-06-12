@@ -44,9 +44,9 @@ reportlab==4.1.0
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/student-management-system.git
+git clone https://github.com/meet-patel2004/STUDENT-MANAGEMENT-SYSTEM.git
 cd student-management-system
-```
+```00
 
 ### 2. Install dependencies
 
