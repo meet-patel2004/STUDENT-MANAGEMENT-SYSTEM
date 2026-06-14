@@ -1,6 +1,6 @@
 # 📚 Student Management System
 
-A RESTful API built with **Flask** for managing students, attendance, marks, and academic reports. It supports role-based access control (admin, teacher, student), JWT authentication, and export capabilities.
+A full-stack Student Management System built with **Flask** (REST API backend) and a **single-page HTML/CSS/JS frontend**. It supports role-based access control (admin, teacher, student), JWT authentication, attendance tracking, marks management, academic reports, and data exports.
 
 ---
 
@@ -8,16 +8,19 @@ A RESTful API built with **Flask** for managing students, attendance, marks, and
 
 ```
 sms/
-├── app.py            # App entry point, config, shared utilities
-├── auth.py           # Authentication routes (register, login, profile)
-├── student.py        # Student CRUD operations
-├── attendance.py     # Attendance tracking and analytics
-├── marks.py          # Marks/grades management
-├── reports.py        # Reports, transcripts, rankings, dashboard
-├── exports.py        # CSV/Excel data export
-├── helper.py         # Shared utilities (grading, GPA, role guards)
-├── sms.sql           # Database schema
-└── requirements.txt  # Python dependencies
+├── app.py              # App entry point, config, shared utilities
+├── auth.py             # Authentication routes (register, login, profile)
+├── student.py          # Student CRUD operations
+├── attendance.py       # Attendance tracking and analytics
+├── marks.py            # Marks/grades management
+├── reports.py          # Reports, transcripts, rankings, dashboard
+├── exports.py          # CSV/Excel data export
+├── helper.py           # Shared utilities (grading, GPA, role guards)
+├── sms.sql             # Database schema
+├── requirements.txt    # Python dependencies
+├── .env                # Environment variables (create this)
+└── frontend/
+    └── index.html      # ← Full frontend (single HTML file)
 ```
 
 ---
@@ -26,6 +29,7 @@ sms/
 
 - Python 3.8+
 - MySQL 5.7+ or MariaDB
+- A modern web browser (Chrome, Firefox, Edge)
 - pip packages (see `requirements.txt`):
 
 ```
@@ -35,42 +39,77 @@ Flask-Bcrypt==1.0.1
 Flask-JWT-Extended==4.6.0
 openpyxl==3.1.0
 reportlab==4.1.0
+python-dotenv==1.0.0
 ```
 
 ---
 
-## 🚀 Setup & Installation
+## 🚀 Setup & Installation (Step-by-Step)
 
-### 1. Clone the repository
+### Step 1 — Clone the Repository
 
 ```bash
 git clone https://github.com/meet-patel2004/STUDENT-MANAGEMENT-SYSTEM.git
-cd student-management-system
-```00
+cd STUDENT-MANAGEMENT-SYSTEM
+```
 
-### 2. Install dependencies
+---
+
+### Step 2 — Create a Virtual Environment (Recommended)
+
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate it
+# On Windows:
+venv\Scripts\activate
+
+# On macOS/Linux:
+source venv/bin/activate
+```
+
+---
+
+### Step 3 — Install Python Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Set up the database
+---
+
+### Step 4 — Set Up the MySQL Database
+
+Make sure MySQL is running, then import the schema:
 
 ```bash
 mysql -u root -p < sms.sql
 ```
 
-### 4. Configure environment variables
+This creates the `SMS` database with all required tables:
+- `users` — system users (admin, teacher, student)
+- `students` — student profiles
+- `attendance` — daily attendance records
+- `marks` — assessment scores and grades
 
-Set the following environment variables (or update defaults in `app.py`):
+---
 
-| Variable | Default | Description |
-|---|---|---|
-| `MYSQL_HOST` | `************` | MySQL host |
-| `MYSQL_USER` | `*******` | MySQL username |
-| `MYSQL_PASSWORD` | `*******` | MySQL password |
-| `MYSQL_DB` | `**********` | Database name |
-| `JWT_SECRET_KEY` | `*********` | JWT signing secret |
+### Step 5 — Configure Environment Variables
+
+Create a `.env` file in the project root:
+
+```env
+MYSQL_HOST=localhost
+MYSQL_USER=root
+MYSQL_PASSWORD=your_mysql_password
+MYSQL_DB=SMS
+JWT_SECRET_KEY=your-very-secret-key-change-this
+```
+
+> ⚠️ **Important:** Always use a strong, random `JWT_SECRET_KEY` in production. Never commit `.env` to version control.
+
+**Alternative — set via terminal:**
 
 **Linux/macOS:**
 ```bash
@@ -83,25 +122,108 @@ export JWT_SECRET_KEY=your-secret-key
 
 **Windows (Command Prompt):**
 ```cmd
+set MYSQL_HOST=localhost
+set MYSQL_USER=root
 set MYSQL_PASSWORD=your_password
+set MYSQL_DB=SMS
 set JWT_SECRET_KEY=your-secret-key
 ```
 
-> ⚠️ **Important:** Always set a strong `JWT_SECRET_KEY` in production.
+---
 
-### 5. Run the server
+### Step 6 — Enable CORS (Required for Frontend)
+
+The frontend runs from a browser and makes requests to `http://localhost:5000`. You must enable CORS in the Flask backend.
+
+**Install Flask-CORS:**
+```bash
+pip install flask-cors
+```
+
+**Add to `app.py`** (after `app = Flask(__name__)`):
+```python
+from flask_cors import CORS
+CORS(app, supports_credentials=True)
+```
+
+---
+
+### Step 7 — Run the Flask Backend
 
 ```bash
 python app.py
 ```
 
-The API will be available at `http://localhost:5000`.
+The API will be available at: **`http://localhost:5000`**
+
+You should see:
+```
+ * Running on http://127.0.0.1:5000
+ * Debug mode: on
+```
+
+---
+
+### Step 8 — Open the Frontend
+
+Simply open the `frontend/index.html` file in your browser:
+
+**Option A — Double-click the file**
+Navigate to `frontend/index.html` and open it directly in Chrome or Firefox.
+
+**Option B — Use VS Code Live Server**
+If you have the Live Server extension:
+1. Right-click `index.html` → "Open with Live Server"
+
+**Option C — Use Python's built-in server**
+```bash
+cd frontend
+python -m http.server 8080
+```
+Then open **`http://localhost:8080`** in your browser.
+
+> **Note:** Make sure the Flask backend is running on port 5000 before using the frontend.
+
+---
+
+### Step 9 — Create Your First Admin Account
+
+On the frontend login page, click **Register** and create an account with role `admin`.
+
+> ⚠️ Only **one admin** account can be created. Subsequent admin registrations will be blocked by the API.
+
+---
+
+## 🖥️ Frontend Overview
+
+The frontend is a **single-page application** (`index.html`) with no external dependencies — pure HTML, CSS, and JavaScript.
+
+### Pages / Sections
+
+| Section | Description |
+|---|---|
+| **Dashboard** | System-wide stats: average grade, attendance rate, pass/fail counts, top 5 students, and today's daily attendance |
+| **Students** | Paginated list with search/filter by name, course, and department. View, edit, or delete any student |
+| **Add Student** | Full form to register a new student with all fields |
+| **Attendance** | Mark attendance for a student; view records with date range filter; analytics with visual progress bars |
+| **Marks & Grades** | Add marks for any student; view marks history with subject breakdown |
+| **Reports** | Summary report, performance & GPA, full semester transcript, department ranking, and PDF report card download |
+| **Export Data** | Download Students, Marks, or Attendance data as CSV or Excel (.xlsx) |
+
+### Design Highlights
+
+- 🌑 **Dark theme** with a clean, professional sidebar layout
+- 🔐 **JWT authentication** — token stored in localStorage, auto-attached to every request
+- 📱 **Responsive** — adapts to smaller screens
+- ✅ **Toast notifications** for success/error feedback
+- 🔍 **Live search** on the Students page
+- 📄 **Paginated** student table with navigation controls
 
 ---
 
 ## 🔐 Authentication
 
-All protected routes require a **Bearer JWT token** in the `Authorization` header:
+All protected routes require a **Bearer JWT token** in the `Authorization` header (handled automatically by the frontend):
 
 ```
 Authorization: Bearer <your_token>
@@ -111,9 +233,9 @@ Authorization: Bearer <your_token>
 
 | Role | Permissions |
 |---|---|
-| `admin` | Full access — manage students, teachers, all data |
+| `admin` | Full access — manage students, teachers, all data, delete records |
 | `teacher` | Add/update students, record marks and attendance |
-| `student` | Read-only access to own data |
+| `student` | Read-only access to data |
 
 ---
 
@@ -280,9 +402,20 @@ users          — system users (admin, teacher, student)
 students       — student profiles and personal details
 attendance     — daily attendance records per student
 marks          — assessment scores, grades, and credits
-exam_types     — lookup table for exam types
-semesters      — lookup table for semester names/dates
 ```
+
+---
+
+## 🛠️ Troubleshooting
+
+| Problem | Solution |
+|---|---|
+| `CORS error` in browser | Add `Flask-CORS` to `app.py` (see Step 6) |
+| `401 Unauthorized` | Log out and log in again — token may have expired |
+| `Cannot connect to API` | Make sure `python app.py` is running on port 5000 |
+| `MySQL connection error` | Check your `.env` credentials and that MySQL service is running |
+| Frontend shows blank page | Open browser console (F12) and check for JS errors |
+| `Admin already exists` error | Only one admin account is allowed per database |
 
 ---
 
